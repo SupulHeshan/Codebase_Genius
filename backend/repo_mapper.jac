@@ -4,7 +4,7 @@ import from git{Repo}
 import from anytree{Node, RenderTree}
 import from mtllm {Model}
 
-glob llm = Model(model_name = "gemini/gemini-2.0-flash");
+#glob llm = Model(model_name = "gemini/gemini-2.0-flash");
 
 glob IGNORED_FOLDERS:set[str] = {".git", "node_modules", "__pycache__"};
 
@@ -72,7 +72,7 @@ obj RepoMapper{
 
 }
 
-def summarize(content: str, max_words: int) -> str by llm();
+
 
 with entry{
     repo_url = "https://github.com/jaseci-labs/littleX.git";
