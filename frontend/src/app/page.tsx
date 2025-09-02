@@ -3,54 +3,63 @@
 import { useState } from "react";
 
 export default function Home() {
-  const [input, setInput] = useState("");
-  const [markdownUrl, setMarkdownUrl] = useState<string | null>(null);
+  const [githubLink, setGithubLink] = useState("");
+  const [responseMsg, setResponseMsg] = useState<string | null>(null);
 
-  const handleGenerate = () => {
-    const markdownContent = `# Codebase Genius\n\n${input}`;
-    const blob = new Blob([markdownContent], { type: "text/markdown" });
-    const url = URL.createObjectURL(blob);
-    setMarkdownUrl(url);
+  const handleSubmit = async () => {
+    try {
+      const response = await fetch("http://localhost:8000/walker/infer", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer YOUR_TOKEN_HERE" // replace with real token
+        },
+        body: JSON.stringify({
+          github_link: githubLink,
+          message: "Process this GitHub repo"
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(await response.text());
+      }
+
+      const data = await response.json();
+      setResponseMsg(data.reports?.[0]?.response || "No response received");
+    } catch (err: any) {
+      setResponseMsg("Error: " + err.message);
+    }
   };
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 p-6">
-      {/* Title */}
-      <h1 className="text-4xl font-bold text-gray-900 mb-2">
-        Codebase Genius
-      </h1>
-      
-      {/* Subheader */}
+      <h1 className="text-4xl font-bold mb-2">Codebase Genius</h1>
       <p className="text-lg text-gray-600 mb-6">
-        Telling the Story of Github Repository
+        Paste your GitHub repo link below
       </p>
 
-      {/* Input & Button */}
+      {/* GitHub link input */}
       <div className="flex flex-col sm:flex-row gap-3 w-full max-w-md">
         <input
           type="text"
-          placeholder="Enter your text here..."
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
+          placeholder="https://github.com/user/repo"
+          value={githubLink}
+          onChange={(e) => setGithubLink(e.target.value)}
           className="flex-1 border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
         <button
-          onClick={handleGenerate}
+          onClick={handleSubmit}
           className="bg-blue-600 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-700 transition"
         >
-          Generate
+          Submit
         </button>
       </div>
 
-      {/* Download Button */}
-      {markdownUrl && (
-        <a
-          href={markdownUrl}
-          download="output.md"
-          className="mt-6 bg-green-600 text-white px-4 py-2 rounded-lg shadow hover:bg-green-700 transition"
-        >
-          Download Markdown
-        </a>
+      {/* Response display */}
+      {responseMsg && (
+        <div className="mt-6 p-4 bg-white border rounded-lg shadow w-full max-w-md">
+          <p className="text-gray-800 whitespace-pre-line">{responseMsg}</p>
+        </div>
       )}
     </div>
   );
