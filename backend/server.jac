@@ -14,6 +14,22 @@ glob repo_mapper:RepoMapper = RepoMapper();
 glob llm = Model(model_name='mistral/mistral-medium-latest', verbose=True);
 
 
+
+def list_tools() -> list[str] {
+    return ["get_from_chroma"];
+}
+
+def use_tool() -> str{
+    return repo_mapper.get_from_chroma(query="all the content",chunck_nos=1);
+}
+
+    
+
+# def add_repo_file(clone_dir:str) -> str {
+#     repo_mapper.add_file(clone_dir);
+#     return f"Added files from {clone_dir}";
+# }
+
 node summerizer{
     def summarize(content: str, max_words: int) -> str by llm();
 
@@ -36,31 +52,16 @@ node summerizer{
     }    
 }
 
-# def list_tools() -> list[str] {
-#     return [repo_mapper.load_repo_files];
-# }
-
-# def use_tool() -> str{
-#     return repo_mapper.load_repo_files(repo_mapper.clone_dir);
-# }
-
-    
-
-# def add_repo_file(clone_dir:str) -> str {
-#     repo_mapper.add_file(clone_dir);
-#     return f"Added files from {clone_dir}";
-# }
-
-
 node tree_generator{
     def generate_tree(message: str) -> str by llm(
         method="ReAct",
-        tools=[add_repo_file]
+        tools=[list_tools, use_tool]
     );
 
-    can generate with clone_repo entry{
+    can generate with infer entry{
         clone_dir = visitor.clone_dir;
-        response = self.generate_tree(message="give me summery of this repo",);
+        repo_mapper.add_file(clone_dir);
+        response = self.generate_tree(message="generate a tree using this",);
         report{"response": response};
     }
 }
@@ -71,11 +72,17 @@ walker infer{
     #has documents:list[dict];
     
     can init_route with `root entry {
-        visit[-->](`?summerizer) else {
-            tree_node = here ++> summerizer();
+        # visit[-->](`?summerizer) else {
+        #     tree_node = here ++> summerizer();
+        #     visit tree_node;
+        # }
+        visit[-->](`?tree_generator) else {
+            tree_node = here ++> tree_generator();
             visit tree_node;
         }
     }
+
+
 }
 
 
@@ -124,44 +131,9 @@ walker clone_repo{
     }    
  
 }
-# node CodeBase(Chat){
-#     has chat_type:ChatType = ChatType.CODEBASE;
-
-
-    
-    
-
-#     # can chat with infer entry{
-#     #     read_content = self.repo_mapper.read_readme();
-#     #     response = self.summarize(read_content, 100);
-#     #     print("Summary of README:", response);
-
-#     # }
-
-# }
 
 
 
-# walker infer {
-#     has message:str;
-#     has chat_history: list[dict];
-#     has file_path: str = "";
-
-#     can init_chat with `root entry {
-#         chat_node = here ++> Chat(chat_type=ChatType.CODEBASE);
-#         visit chat_node;
-#     }
-
-#     can route with Chat entry {
-#         print("Routing message:", self.message, "to chat type:", here.chat_type);
-#         visit here;
-#     }
-# }
-
-
-
-    
-    
 # with entry{
 #     clone_dir = "/home/heshan0926/Projects/Codebase_Genius/backend/temp_repo";
 #     print(add_repo_file());
