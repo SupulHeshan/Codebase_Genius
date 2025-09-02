@@ -25,20 +25,28 @@ def bootstrap_frontend(){
                 "http://localhost:8000/walker/clone_repo",
                 json=payload
             );
+            
         }
             if response.status_code == 200{
                 response = response.json();
                 print("response is",response);
                 #st.markdown(response["reports"][0]["response"]);
-                markdown_text = (
-                response.get("response") 
-                or response.get("result") 
-                or response.get("reports", [{}])[0].get("response") 
-                or "⚠️ No markdown found in response"
-                );  
-                st.write(markdown_text);
+                summary = response["reports"][1]["response"];
+                st.write(summary);
+
                 
-                st.session_state.generated_md = response["reports"][0]["response"];
+
+
+                #st.write("response is:",response);
+                # markdown_text = (
+                # response.get("response") 
+                # or response.get("result") 
+                # or response.get("reports", [{}])[0].get("response") 
+                # or "⚠️ No markdown found in response"
+                # );  
+                # st.write(markdown_text);
+                
+                st.session_state.generated_md = summary;
                 st.success("Markdown generated successfully!");
             }
             else{

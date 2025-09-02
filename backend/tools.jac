@@ -1,11 +1,10 @@
 import os;
 import requests;
-import from langchain_community.document_loaders {PyPDFDirectoryLoader, PyPDFLoader}
+import from langchain_community.document_loaders {PyPDFDirectoryLoader, PyPDFLoader, TextLoader}
 import from langchain_text_splitters {RecursiveCharacterTextSplitter}
 import from langchain.schema.document {Document}
 import from langchain_mistralai {MistralAIEmbeddings}
 import from langchain_chroma {Chroma}
-import from langchain_community.document_loaders {TextLoader}
 
 #glob llm = Model(model_name = "gemini/gemini-2.0-flash");
 
@@ -33,10 +32,42 @@ obj RepoMapper{
         return text_splitter.split_documents(documents);
     }
 
+    def document_loader(clone_dir: str){
+        ext = os.path.splitext(clone_dir)[1].lower();
+        if ext == ".pdf"{
+            loader = PyPDFLoader(clone_dir);
+        }
+        elif ext in {".txt", ".md", ".py", ".java", ".js", ".html", ".css", ".json", ".xml", ".csv"}{
+            loader = TextLoader(clone_dir, encoding="utf-8");
+        }
+        else{
+            print(f"Unsupported file type: {ext}. Skipping {clone_dir}.");
+            return [];
+        }
+        return loader.load();
+    }
+
+    def add_file1(clone_dir: str){
+        documents = self.document_loader(clone_dir);
+        chunks = self.split_documents(documents);
+        chunks_len = len(chunks);
+        self.add_to_chroma(chunks);
+    }
+
     def add_file(clone_dir: str){
-        documents = load_repo_files(clone_dir);
+        documents = self.load_repo_files(clone_dir);
         chunks = self.split_documents(documents);
         self.add_to_chroma(chunks);
+    }
+
+    def readme(clone_dir: str){
+        readme_path = os.path.join(clone_dir, "README.md");
+        if os.path.exists(readme_path){
+            with open(readme_path, "r", encoding="utf-8") as f{
+                return f.read();
+            }
+        }
+        return "No README file found.";
     }
 
     def load_repo_files(clone_dir: str){
@@ -57,8 +88,11 @@ obj RepoMapper{
 
     def add_to_chroma(chunks: list[Document]){
         # new_chunks = [];
+        
         db = Chroma(persist_directory=self.chroma_path, embedding_function=embeddings);
+        db.reset_collection();
         db.add_documents(chunks);
+
 
         
         # for chunk in chunks{
@@ -66,6 +100,15 @@ obj RepoMapper{
         # }
         # documents.extend(chunks);
                     
+    }
+
+    def get_from_chroma(query: str,chunck_nos: int=10) {
+        db = Chroma(
+            persist_directory=self.chroma_path,
+            embedding_function=embeddings
+        );
+        results = db.similarity_search_with_score(query,k=chunck_nos);
+        return results;
     }
 
     # def build_file_tree -> Node{
@@ -109,15 +152,15 @@ obj RepoMapper{
     #     }
     # }
 
-    def read_readme{
-        readme_path = os.path.join(self.clone_dir, "README.md");
-        if os.path.exists(readme_path){
-            with open(readme_path, "r", encoding="utf-8") as f{
-                return f.read();
-            }
-        }
-        return "No README file found.";
-    }
+    # def read_readme{
+    #     readme_path = os.path.join(self.clone_dir, "README.md");
+    #     if os.path.exists(readme_path){
+    #         with open(readme_path, "r", encoding="utf-8") as f{
+    #             return f.read();
+    #         }
+    #     }
+    #     return "No README file found.";
+    # }
 
 }
 
