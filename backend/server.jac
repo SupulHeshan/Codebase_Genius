@@ -11,8 +11,7 @@ import anyio;
 import from tools {RepoMapper}
 
 glob repo_mapper:RepoMapper = RepoMapper();
-glob llm = Model(model_name='mistral/mistral-medium-latest', verbose=True);
-
+glob llm = Model(model_name='mistral/mistral-large-latest', verbose=True);
 
 
 def list_tools() -> list[str] {
@@ -23,12 +22,6 @@ def use_tool() -> str{
     return repo_mapper.get_from_chroma(query="all the content",chunck_nos=1);
 }
 
-    
-
-# def add_repo_file(clone_dir:str) -> str {
-#     repo_mapper.add_file(clone_dir);
-#     return f"Added files from {clone_dir}";
-# }
 
 node summerizer{
     def summarize(content: str, max_words: int) -> str by llm();
@@ -48,7 +41,7 @@ node summerizer{
             chunk_summery.append(summary);
         }
         final_summary = self.summarize(", ".join(chunk_summery), max_words = 150);
-        report{"response": final_summary};
+        report{"name":"Summary of the README.md file","response": final_summary};
     }    
 }
 
@@ -62,27 +55,25 @@ node tree_generator{
         clone_dir = visitor.clone_dir;
         repo_mapper.add_file(clone_dir);
         response = self.generate_tree(message="generate a tree using this",);
-        report{"response": response};
+        report{"name":"Structure of Files in Repository","response": response};
     }
 }
 
 walker infer{
-    has message:str;
+    # has message:str;
     has clone_dir:str = "temp_repo";
     #has documents:list[dict];
     
     can init_route with `root entry {
-        # visit[-->](`?summerizer) else {
-        #     tree_node = here ++> summerizer();
-        #     visit tree_node;
-        # }
         visit[-->](`?tree_generator) else {
             tree_node = here ++> tree_generator();
             visit tree_node;
         }
+        visit[-->](`?summerizer) else {
+            tree_node = here ++> summerizer();
+            visit tree_node;
+        }
     }
-
-
 }
 
 
@@ -90,9 +81,11 @@ node event{
     has clone_dir:str = "temp_repo";
 
     can chat with clone_repo entry{
-        response1 = infer(message = visitor.message) spawn root;
+        response_list = [];
+        response = infer(message = visitor.message) spawn root;
+        response_list.append(response);
         
-        report {"response": response1};
+        report {"response": response_list};  #have the chack this when remove it still works
     }
 }
 
@@ -113,8 +106,6 @@ walker clone_repo{
         }
         print(f"Cloning {self.message} into {self.clone_dir}...");
         Repo.clone_from(self.message, self.clone_dir);
-
-        # repo_mapper.add_file(self.clone_dir);
         
         report{
             "status": "success",
@@ -132,9 +123,3 @@ walker clone_repo{
  
 }
 
-
-
-# with entry{
-#     clone_dir = "/home/heshan0926/Projects/Codebase_Genius/backend/temp_repo";
-#     print(add_repo_file());
-# }

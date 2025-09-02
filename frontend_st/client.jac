@@ -30,23 +30,13 @@ def bootstrap_frontend(){
             if response.status_code == 200{
                 response = response.json();
                 print("response is",response);
-                #st.markdown(response["reports"][0]["response"]);
-                summary = response["reports"][1]["response"];
-                st.write(summary);
-
                 
-
-
-                #st.write("response is:",response);
-                # markdown_text = (
-                # response.get("response") 
-                # or response.get("result") 
-                # or response.get("reports", [{}])[0].get("response") 
-                # or "⚠️ No markdown found in response"
-                # );  
-                # st.write(markdown_text);
-                
-                st.session_state.generated_md = summary;
+                st.session_state.generated_md = "";
+                for res in range(1,3){
+                    st.session_state.generated_md += "## " + response["reports"][res]["name"] + "\n";
+                    st.session_state.generated_md += response["reports"][res]["response"] + "\n\n";
+                }
+                st.markdown(st.session_state.generated_md);
                 st.success("Markdown generated successfully!");
             }
             else{
@@ -64,33 +54,5 @@ def bootstrap_frontend(){
     }    
 }
 with entry{
-    # INSTANCE_URL = "http://localhost:8000";
-    # TEST_USER_EMAIL = "test@mail.com";
-    # TEST_USER_PASSWORD = "password";
-
-    # response = requests.post(
-    #     f"{INSTANCE_URL}/user/login",
-    #     json={"email": TEST_USER_EMAIL, "password": TEST_USER_PASSWORD}
-    # );
-
-    # if response.status_code != 200{
-    #     # Register if login fails
-    #     response = requests.post(
-    #         f"{INSTANCE_URL}/user/register",
-    #         json={"email": TEST_USER_EMAIL, "password": TEST_USER_PASSWORD}
-    #     );
-    #     assert 200 <= response.status_code < 300, f"Unexpected status: {response.status_code}, body: {response.text}";
-
-
-    #     response = requests.post(
-    #         f"{INSTANCE_URL}/user/login",
-    #         json={"email": TEST_USER_EMAIL, "password": TEST_USER_PASSWORD}
-    #     );
-    #     assert 200 <= response.status_code < 300, f"Unexpected status: {response.status_code}, body: {response.text}";
-
-    # }
-    # token = response.json()["token"];
-    # print("Token:", token);
-
     bootstrap_frontend();
 }    
