@@ -1,16 +1,20 @@
 include jaclens;
 import sys;
 import shutil;
-import from mtllm.llm {Model}
-import from mtllm.types {Text}
+import from byllm.llm {Model}
+import from byllm.types {Text}
 import from git{Repo}
 import os;
 import base64;
 import requests;
 import anyio;
 import from tools {RepoMapper}
+import re;
+import from pathlib {Path}
+import from tool_tree_sitter {ModuleElementExtractor}
 
 glob repo_mapper:RepoMapper = RepoMapper();
+glob tool_t_sitter:ModuleElementExtractor = ModuleElementExtractor();
 glob llm = Model(model_name='mistral/mistral-large-latest', verbose=True);
 
 
@@ -26,7 +30,7 @@ def use_tool() -> str{
 node summerizer{
     def summarize(content: str, max_words: int) -> str by llm();
 
-    can summarize_readme with infer entry {
+    can summarize_readme with clone_repo entry {
         readme_path = os.path.join(visitor.clone_dir, "README.md");
         if os.path.exists(readme_path){
             repo_mapper.add_file1(readme_path);
@@ -51,7 +55,7 @@ node tree_generator{
         tools=[list_tools, use_tool]
     );
 
-    can generate with infer entry{
+    can generate with clone_repo entry{
         clone_dir = visitor.clone_dir;
         repo_mapper.add_file(clone_dir);
         response = self.generate_tree(message="generate a tree using this",);
@@ -59,35 +63,46 @@ node tree_generator{
     }
 }
 
-walker infer{
-    # has message:str;
-    has clone_dir:str = "temp_repo";
-    #has documents:list[dict];
-    
-    can init_route with `root entry {
-        visit[-->](`?tree_generator) else {
-            tree_node = here ++> tree_generator();
-            visit tree_node;
+node repo_analyzer {
+    def get_priority(prompt: str) -> str by llm();
+
+    def get_doc(content:str) -> str by llm();
+
+    can analyze_repo with clone_repo entry {
+        with open("all_files.txt", "r") as f {
+            priority = f.read();
         }
-        visit[-->](`?summerizer) else {
-            tree_node = here ++> summerizer();
-            visit tree_node;
-        }
-    }
-}
-
-
-node event{
-    has clone_dir:str = "temp_repo";
-
-    can chat with clone_repo entry{
-        response_list = [];
-        response = infer(message = visitor.message) spawn root;
-        response_list.append(response);
+        prompt = """hey I am documenting this repo. 
+        So can you tell me what are the file you need to look into and 
+        recursively I need to check. It should be in high priority. 
+        Can you give me it as a list. only High priority""";
+        prompt += priority;
+        priority_list = self.get_priority(prompt);
+        # report{"name":"name", "response": priority_list};
+        paths = re.findall(r'`([^`]*)`', priority_list);
         
-        report {"response": response_list};  #have the chack this when remove it still works
+        for path in paths{
+            if os.path.isfile(path){
+                content = "";
+                tool_t_sitter.extract_from_file(path);
+                with open(path, "r", encoding="utf-8") as f{
+                    content = f.read();
+                }
+            
+                content+= " Give the high quality documentation of this content:";
+                documentation = self.get_doc(content);
+                print(path);
+                print(documentation);
+                report{"name":path, "response":documentation};
+            }else{
+                print(f"⚠️ Skipping directory: {path}");
+            }
+            
+        }    
+    
     }
 }
+
 
 walker clone_repo{
     has message:str;
@@ -106,18 +121,20 @@ walker clone_repo{
         }
         print(f"Cloning {self.message} into {self.clone_dir}...");
         Repo.clone_from(self.message, self.clone_dir);
-        
-        report{
-            "status": "success",
-            "message": f"Repository cloned to {self.clone_dir}"
-        };
     }
 
     can init_event with `root entry {
-        visit [-->](`?event)else {
-            event_node = here ++> event(clone_dir=self.clone_dir);
-            print("Event Node Created");
-            visit event_node;
+        visit[-->](`?tree_generator) else {
+            tree_node = here ++> tree_generator();
+            visit tree_node;
+        }
+        visit[-->](`?summerizer) else {
+            tree_node = here ++> summerizer();
+            visit tree_node;
+        }
+        visit[-->](`?repo_analyzer) else {
+            tree_node = here ++> repo_analyzer();
+            visit tree_node;
         }
     }    
  

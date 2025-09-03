@@ -1,0 +1,3 @@
+# Module elements extracted from: temp_repo/rag-system/backend/Dockerfile
+
+python = ...

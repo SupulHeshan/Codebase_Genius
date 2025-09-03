@@ -6,8 +6,6 @@ import from langchain.schema.document {Document}
 import from langchain_mistralai {MistralAIEmbeddings}
 import from langchain_chroma {Chroma}
 
-#glob llm = Model(model_name = "gemini/gemini-2.0-flash");
-
 glob IGNORED_FOLDERS:set[str] = {".git", "node_modules", "__pycache__"};
 glob embeddings = MistralAIEmbeddings();
 
@@ -50,7 +48,6 @@ obj RepoMapper{
     def add_file(clone_dir: str){
         document_dir = self.load_repo_files(clone_dir);
         document = self.document_loader(document_dir);
-        #chunks = self.split_documents(documents);
         self.add_to_chroma(document);
     }
 
@@ -88,10 +85,6 @@ obj RepoMapper{
         db = Chroma(persist_directory=self.chroma_path, embedding_function=embeddings);
         db.reset_collection();
         db.add_documents(chunks);
-        # for chunk in chunks{
-        #     chunk.metadata["source"] = file_path;
-        # }
-        # documents.extend(chunks);  
     }
 
     def get_from_chroma(query: str,chunck_nos: int=10) {
@@ -103,60 +96,6 @@ obj RepoMapper{
         return results;
     }
 
-
-    # def build_file_tree -> Node{
-    #     self.root_node = Node(os.path.basename(self.clone_dir));
-    #     nodes = {"": self.root_node};
-
-    #     for (dirpath, dirnames, filenames) in os.walk(self.clone_dir){
-    #         # Skip ignored folders
-    #         dirnames[:] = [d for d in dirnames if d not in IGNORED_FOLDERS];
-
-    #         relevant_path = os.path.relpath(dirpath, self.clone_dir);
-    #         if relevant_path == "."{
-    #             parent = self.root_node;
-    #         } 
-    #         else {
-    #             parts = relevant_path.split(os.sep);
-    #             parent_path = "";
-    #             parent = self.root_node;
-    #             for part in parts{
-    #                 parent_path = f"{parent_path}/{part}" if parent_path else part;
-    #                 if parent_path not in nodes{
-    #                     nodes[parent_path] = Node(part, parent=parent);
-    #                 }
-    #                 parent = nodes[parent_path];
-    #             }
-    #         }
-    #         for filename in filenames{
-    #             Node(filename, parent=parent);
-    #         }
-    #     }
-    #     return self.root_node;
-    # }
-
-    # def print_file_tree{
-    #     if self.root_node is None{
-    #         print("File tree not built yet. Call build_file_tree() first.");
-    #         return;
-    #     }
-    #     for (pre, fill, node) in RenderTree(self.root_node){
-    #         print("%s%s" % (pre, node.name));
-    #     }
-    # }
-
 }
 
-
-
-# with entry{
-#     repo_url = "https://github.com/jaseci-labs/littleX.git";
-#     mapper = RepoMapper(repo_url);
-#     mapper.clone_repo();
-#     mapper.build_file_tree();
-#     mapper.print_file_tree();
-#     readme_content = mapper.read_readme();
-#     summary = summarize(readme_content, 100);
-#     print("\nREADME.md Summary:\n", summary, "...");
-# }
 
