@@ -1,4 +1,4 @@
-# <img width="35" height="35" alt="image" src="https://github.com/user-attachments/assets/8bbb38e9-b85a-46c7-bb7f-67a545676e83" />     🧠 Codebase Genius
+🧠 Codebase Genius
 
 The primary objective of this project is to create an agentic system that accepts a GitHub repository URL and produces quality Markdown documentation. The system is designed to be particularly effective for repositories written in Python and Jac. A key feature is the automatic generation of visual diagrams to represent the codebase's structure and flow.
 
