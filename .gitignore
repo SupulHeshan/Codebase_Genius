@@ -1,0 +1,67 @@
+# =========================
+# Python
+# =========================
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.so
+*.egg
+*.egg-info/
+*.log
+
+# Virtual environments
+venv/
+env/
+jac-env/
+
+# =========================
+# Tree sitter related
+# =========================
+backend/build/
+backend/tree-sitter-Python/
+backend/vendor/
+
+# =========================
+# Jac language related
+# =========================
+*.jac~
+*.swp
+*.bak
+
+# =========================
+# Project-specific
+# =========================
+
+# Auto-generated or temp elements
+*_elements.txt
+priority_list.txt
+
+# Temp repos / cache
+temp_repo
+backend/temp_repo/
+backend/chroma/
+
+# Config / secrets
+*.env
+*.env_elements.txt
+
+# Docker related temp/config files
+Dockerfile_elements.txt
+docker-compose_elements.txt
+
+# All other element-related files in backend/
+backend/*_elements.txt
+
+# =========================
+# IDE / Editor junk
+# =========================
+.vscode/
+.idea/
+*.iml
+
+# =========================
+# OS generated files
+# =========================
+.DS_Store
+Thumbs.db

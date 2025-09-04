@@ -138,7 +138,8 @@ class ModuleElementExtractor:
 def main():
     extractor = ModuleElementExtractor()
     
-    # Default to unitree.py if no arguments provided
+
+    # Default to .py if no arguments provided
     if len(sys.argv) > 1:
         input_file = sys.argv[1]
     else:

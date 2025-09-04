@@ -1,14 +1,12 @@
 import os;
 import requests;
-import from langchain_community.document_loaders {PyPDFDirectoryLoader, PyPDFLoader, TextLoader}
+import from langchain_community.document_loaders {PyPDFLoader, TextLoader}
 import from langchain_text_splitters {RecursiveCharacterTextSplitter}
 import from langchain.schema.document {Document}
 import from langchain_mistralai {MistralAIEmbeddings}
 import from langchain_chroma {Chroma}
 
-glob IGNORED_FOLDERS:set[str] = {".git", "node_modules", "__pycache__"};
 glob embeddings = MistralAIEmbeddings();
-
 
 obj RepoMapper{
     has clone_dir:str = "temp_repo";
@@ -38,6 +36,7 @@ obj RepoMapper{
         return loader.load();
     }
 
+    # this is for README.md file summarize
     def add_file1(clone_dir: str){
         documents = self.document_loader(clone_dir);
         chunks = self.split_documents(documents);
@@ -45,6 +44,7 @@ obj RepoMapper{
         self.add_to_chroma(chunks);
     }
 
+    # this is for generate a tree
     def add_file(clone_dir: str){
         document_dir = self.load_repo_files(clone_dir);
         document = self.document_loader(document_dir);
@@ -87,6 +87,7 @@ obj RepoMapper{
         db.add_documents(chunks);
     }
 
+    # to retrieve data from vector data base
     def get_from_chroma(query: str,chunck_nos: int=10) {
         db = Chroma(
             persist_directory=self.chroma_path,
@@ -97,5 +98,3 @@ obj RepoMapper{
     }
 
 }
-
-

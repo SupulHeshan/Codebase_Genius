@@ -4,7 +4,6 @@ import from byllm.llm {Model}
 import from byllm.types {Text}
 import from git{Repo}
 import os;
-import base64;
 import requests;
 import anyio;
 import from tools {RepoMapper}
@@ -107,10 +106,11 @@ walker clone_repo{
     has message:str;
     has clone_dir:str = "temp_repo";
 
+    # to ignore the authentication
     obj _specs_ {
         static has auth: bool=False;
     }
-
+    # for clone the repository
     can clone with `root entry {
         if not os.path.exists(self.clone_dir){
             os.makedirs(self.clone_dir);
