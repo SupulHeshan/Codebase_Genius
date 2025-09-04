@@ -1,0 +1,13 @@
+jaclang
+jac-cloud 
+jac-streamlit 
+byllm 
+langchain 
+langchain-community 
+langchain-openai 
+langchain-chroma 
+chromadb 
+openai 
+langchain_mistralai
+tree-sitter
+tree-sitter-python
