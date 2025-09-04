@@ -52,44 +52,26 @@ To accomplish this, a multi-agent architecture was used. Think of it as a team o
 - streamlit
 - Mistral API key
 
-### Quick Start with Streamlit
+### Star with Streamlit
 
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/yourusername/rag-system.git
-   cd rag-system
-   ```
-
-2. Create environment file:
-   ```bash
-   # Create .env file with your Mistral API key
-   echo "MISTRAL_API_KEY=your-api-key-here" > .env
-   ```
-
-3. Start the application:
-   ```bash
-   docker-compose up --build
-   ```
-
-4. Access the application at `http://localhost:3000`
-
-### Manual Setup
-
-1. Backend Setup:
+1. Backend Setup: Terminal 1
    ```bash
    cd backend
-   python -m venv venv
-   source venv/bin/activate  # or `venv\Scripts\activate` on Windows
+   python -m venv jac-env
+   source jac-env/bin/activate  # or `jac-env\Scripts\activate` on Windows 
    pip install -r requirements.txt
-   echo "MISTRAL_API_KEY=your-api-key-here" > .env
-   uvicorn main:app --reload --host 0.0.0.0 --port 8000
+   export "MISTRAL_API_KEY=your-api-key-here" > .env
+   export 'MISTRAL_API_KEY'="your api key"
+   export 'HF_KEY'="your hf key"
+   export REQUIRE_AUTH_BY_DEFAULT=false
+   jac serve server.jac
    ```
 
-2. Frontend Setup:
+2. Frontend Setup: Terminal 2
    ```bash
    cd frontend
-   npm install
-   npm run dev
+   pip install jac streamlit
+   jac streamlit client.jac
    ```
 
 
@@ -98,6 +80,7 @@ To accomplish this, a multi-agent architecture was used. Think of it as a team o
 The following environment variables can be set in the `.env` file in the `rag-system` directory:
 
 - `MISTRAL_API_KEY`: Your Mistral AI API key.
+- `HF_KEY` : your HuggingFace Access Token Key
 - `CHUNK_SIZE`: The size of the chunks the document is split into (default: 1000).
 - `CHUNK_OVERLAP`: The number of overlapping characters between chunks (default: 100).
 - `TOP_K`: The number of chunks to retrieve from the vector store (default: 10).
