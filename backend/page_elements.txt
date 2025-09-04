@@ -1,2 +1,0 @@
-# Module elements extracted from: temp_repo/rag-system/frontend/src/app/page.tsx
-
