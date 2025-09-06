@@ -36,11 +36,13 @@ backend/vendor/
 # Auto-generated or temp elements
 *_elements.txt
 priority_list.txt
+all_files.txt
 
 # Temp repos / cache
 temp_repo
 backend/temp_repo/
 backend/chroma/
+chroma
 
 # Config / secrets
 *.env

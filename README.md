@@ -56,10 +56,10 @@ To accomplish this, a multi-agent architecture was used. Think of it as a team o
 
 1. Backend Setup: Terminal 1
    ```bash
-   cd backend
    python -m venv jac-env
    source jac-env/bin/activate  # or `jac-env\Scripts\activate` on Windows 
    pip install -r requirements.txt
+   cd backend
    export "MISTRAL_API_KEY=your-api-key-here" > .env
    export 'MISTRAL_API_KEY'="your api key"
    export 'HF_KEY'="your hf key"
@@ -69,6 +69,7 @@ To accomplish this, a multi-agent architecture was used. Think of it as a team o
 
 2. Frontend Setup: Terminal 2
    ```bash
+   source jac-env/bin/activate
    cd frontend
    pip install jac streamlit
    jac streamlit client.jac

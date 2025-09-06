@@ -1,6 +1,8 @@
 jaclang
 jac-cloud 
 byllm 
+GitPython
+jac-streamlit
 langchain 
 langchain-community 
 langchain-openai 
