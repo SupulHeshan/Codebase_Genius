@@ -1,0 +1,10 @@
+- **High Priority:**
+  - `temp_repo/rag-system/backend/rag_chain.py`
+  - `temp_repo/rag-system/backend/improved_rag.py`
+  - `temp_repo/rag-system/backend/main.py`
+  - `temp_repo/rag-system/backend/Dockerfile`
+  - `temp_repo/rag-system/backend/entrypoint.sh`
+  - `temp_repo/rag-system/docker-compose.yml`
+  - `temp_repo/rag-system/frontend/src/app/layout.tsx`
+  - `temp_repo/rag-system/frontend/src/app/page.tsx`
+  - `temp_repo/rag-system/frontend/package.json`

@@ -67,16 +67,15 @@ node repo_analyzer {
     def get_doc(content:str) -> str by llm();
 
     can analyze_repo with clone_repo entry {
-        with open("all_files.txt", "r") as f {
+        with open("all_files.txt", "r",encoding="utf-8") as f {
             priority = f.read();
         }
         prompt = """hey I am documenting this repo. 
         So can you tell me what are the file you need to look into and 
-        recursively I need to check. It should be in high priority. 
+        ignore the README.md file. It should be in high priority. 
         Can you give me it as a list. only High priority""";
         prompt += priority;
         priority_list = self.get_priority(prompt);
-        # report{"name":"name", "response": priority_list};
         paths = re.findall(r'`([^`]*)`', priority_list);
         
         for path in paths{
