@@ -67,7 +67,7 @@ node repo_analyzer {
     def get_doc(content:str) -> str by llm();
 
     can analyze_repo with clone_repo entry {
-        with open("/home/heshan0926/Projects/Codebase_Genius-clean/all_files.txt", "r") as f {
+        with open("all_files.txt", "r") as f {
             priority = f.read();
         }
         prompt = """hey I am documenting this repo. 
