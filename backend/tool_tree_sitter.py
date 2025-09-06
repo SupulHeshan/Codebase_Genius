@@ -103,7 +103,7 @@ class ModuleElementExtractor:
     def extract_from_file(self, file_path: str, output_file: Optional[str] = None):
         """Extract elements from a Python file and save to output file."""
         try:
-            with open(file_path, 'r', encoding='utf-8') as f:
+            with open(file_path, 'r', encoding='utf-8', errors="ignore") as f:
                 source_code = f.read()
         except Exception as e:
             print(f"Error reading file {file_path}: {e}")
