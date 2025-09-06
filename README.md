@@ -2,6 +2,12 @@
 
 The primary objective of this project is to create an agentic system that accepts a GitHub repository URL and produces quality Markdown documentation. The system is designed to be particularly effective for repositories written in Python and Jac. A key feature is the automatic generation of visual diagrams to represent the codebase's structure and flow.
 
+## 🎬 Demo Video
+
+
+https://github.com/user-attachments/assets/09eecfd8-289c-4382-a3e3-bef1888be59b
+
+
 ## ➡️ High-Level Workflow
 The process is broken down into a sequence of clear steps. The agent will first understand the "what" and "where" of the code and then dive deeper to understand the "how."
 
