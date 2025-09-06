@@ -128,10 +128,10 @@ walker clone_repo{
             tree_node = here ++> tree_generator();
             visit tree_node;
         }
-        # visit[-->](`?summerizer) else {
-        #     tree_node = here ++> summerizer();
-        #     visit tree_node;
-        # }
+        visit[-->](`?summerizer) else {
+            tree_node = here ++> summerizer();
+            visit tree_node;
+        }
         visit[-->](`?repo_analyzer) else {
             tree_node = here ++> repo_analyzer();
             visit tree_node;
