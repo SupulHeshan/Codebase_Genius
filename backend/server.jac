@@ -76,6 +76,9 @@ node repo_analyzer {
         Can you give me it as a list. only High priority """;
         prompt += priority;
         priority_list = self.get_priority(prompt);
+         with open("priority_list.txt", "w", encoding="utf-8") as f{
+            f.write(priority_list);
+        }
         paths = re.findall(r'`([^`]*)`', priority_list);
         
         for path in paths{
@@ -87,10 +90,8 @@ node repo_analyzer {
                     content = f.read();
                 }
             
-                content+= " Give the high quality documentation of this content and give the relavant diagrams if needed. output should be suited for markdown format:";
+                content+= " Give the high quality documentation of this content and give the relavant diagrams if needed";
                 documentation = self.get_doc(content);
-                print(path);
-                print(documentation);
                 report{"name":path, "response":documentation};
             }else{
                 print(f"⚠️ Skipping directory: {path}");
@@ -127,10 +128,10 @@ walker clone_repo{
             tree_node = here ++> tree_generator();
             visit tree_node;
         }
-        visit[-->](`?summerizer) else {
-            tree_node = here ++> summerizer();
-            visit tree_node;
-        }
+        # visit[-->](`?summerizer) else {
+        #     tree_node = here ++> summerizer();
+        #     visit tree_node;
+        # }
         visit[-->](`?repo_analyzer) else {
             tree_node = here ++> repo_analyzer();
             visit tree_node;
