@@ -1,6 +1,5 @@
 jaclang
 jac-cloud 
-jac-streamlit 
 byllm 
 langchain 
 langchain-community 
