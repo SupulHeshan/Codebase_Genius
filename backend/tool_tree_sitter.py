@@ -134,6 +134,7 @@ class ModuleElementExtractor:
         except Exception as e:
             print(f"Error writing to file {output_file}: {e}")
 
+        return output_file
 
 def main():
     extractor = ModuleElementExtractor()

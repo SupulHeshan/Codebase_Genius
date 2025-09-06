@@ -73,7 +73,7 @@ node repo_analyzer {
         prompt = """hey I am documenting this repo. 
         So can you tell me what are the file you need to look into and 
         ignore the README.md file. It should be in high priority. 
-        Can you give me it as a list. only High priority""";
+        Can you give me it as a list. only High priority """;
         prompt += priority;
         priority_list = self.get_priority(prompt);
         paths = re.findall(r'`([^`]*)`', priority_list);
@@ -81,12 +81,13 @@ node repo_analyzer {
         for path in paths{
             if os.path.isfile(path){
                 content = "";
-                tool_t_sitter.extract_from_file(path);
-                with open(path, "r", encoding="utf-8") as f{
+
+                output_file = tool_t_sitter.extract_from_file(path);
+                with open(output_file, "r", encoding="utf-8") as f{
                     content = f.read();
                 }
             
-                content+= " Give the high quality documentation of this content:";
+                content+= " Give the high quality documentation of this content and give the relavant diagrams if needed. output should be suited for markdown format:";
                 documentation = self.get_doc(content);
                 print(path);
                 print(documentation);
