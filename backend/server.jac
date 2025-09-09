@@ -13,7 +13,7 @@ import from tool_tree_sitter {ModuleElementExtractor}
 
 glob repo_mapper:RepoMapper = RepoMapper();
 glob tool_t_sitter:ModuleElementExtractor = ModuleElementExtractor();
-glob llm = Model(model_name='mistral/mistral-large-latest', verbose=True);
+glob llm = Model(model_name="mistral/mistral-large-latest", verbose=True);
 
 
 def list_tools() -> list[str] {
@@ -73,26 +73,33 @@ node repo_analyzer {
         prompt = """hey I am documenting this repo. 
         So can you tell me what are the file you need to look into and 
         ignore the README.md file. It should be in high priority. 
-        Can you give me it as a list. only High priority """;
+        Just use commas to seperate each paths. need only High priority """;
         prompt += priority;
         priority_list = self.get_priority(prompt);
-         with open("priority_list.txt", "w", encoding="utf-8") as f{
+        with open("priority_list.txt", "w", encoding="utf-8") as f{
             f.write(priority_list);
         }
-        paths = re.findall(r'`([^`]*)`', priority_list);
+        paths = [f.strip() for f in priority_list.split(",")];
+        print("list of priority paths: ", paths);
         
         for path in paths{
             if os.path.isfile(path){
-                content = "";
+                try{
+                    content = "";
 
-                output_file = tool_t_sitter.extract_from_file(path);
-                with open(output_file, "r", encoding="utf-8") as f{
-                    content = f.read();
+                    output_file = tool_t_sitter.extract_from_file(path);
+                    with open(output_file, "r", encoding="utf-8") as f{
+                        content = f.read();
+                    }
+                
+                    content+= " Give the high quality documentation of this content and give the relavant diagrams if needed";
+                    documentation = self.get_doc(content);
+                    report{"name":path, "response":documentation};
+
+                }except Exception as e{
+                    report{"name":"error", "response":e};
                 }
-            
-                content+= " Give the high quality documentation of this content and give the relavant diagrams if needed";
-                documentation = self.get_doc(content);
-                report{"name":path, "response":documentation};
+                
             }else{
                 print(f"⚠️ Skipping directory: {path}");
             }
